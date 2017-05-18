@@ -16,6 +16,10 @@ import renderEngine.Renderer;
 import shaders.StaticShader;
 import textures.ModelTexture;
 
+/*
+	@author ivanc
+*/
+
 public class MainGameLoop {
 
 	public static void main(String[] args) {

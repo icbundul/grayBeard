@@ -1,5 +1,9 @@
 package engineTester;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -12,8 +16,9 @@ import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
 import renderEngine.OBJLoader;
-import renderEngine.Renderer;
+import renderEngine.EntityRenderer;
 import shaders.StaticShader;
+import terrains.Terrain;
 import textures.ModelTexture;
 
 /*
@@ -49,15 +54,35 @@ public class MainGameLoop {
 		
 		//RawModel model = loader.loadToVAO(vertices, textureCoords, indices);
 	
-		RawModel model = OBJLoader.loadObjModel("dragon", loader);
+		RawModel model = OBJLoader.loadObjModel("tree", loader);
 		
-		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("white")));	
+		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("tree")));	
 		ModelTexture texture = staticModel.getTexture();
 		texture.setShineDamper(10);
 		texture.setReflectivity(1);
 		
-		Entity entity = new Entity(staticModel, new Vector3f(0,0,-25) , 0, 160 , 0, 1);
+		/* -- */
+		
+		final int NUMBER_ENTITIES = 40000;
+		
+		List<Entity> entities = new ArrayList<Entity>();
+		
+		Random randomGenerator = new Random();
+		
+		 for (int idx = 1; idx <= NUMBER_ENTITIES; ++idx){
+		      entities.add(new Entity(staticModel, new Vector3f(randomGenerator.nextInt(800), 0, -randomGenerator.nextInt(800)),0, 0 , 0, 1));
+		    }
+		
+		/* -- */ 
+		 
+		Entity entity = new Entity(staticModel, new Vector3f(40,0,-60) , 0, 0 , 0, 1);
+		Entity entity2 = new Entity(staticModel, new Vector3f(40,0,-40) , 0, 0 , 0, 1);
+		
+		
 		Light light = new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1,1,1));
+		
+		Terrain terrain = new Terrain(1, -1, loader, new ModelTexture(loader.loadTexture("grass"))); //(0,-1), (1,-1)
+		Terrain terrain2 = new Terrain(0, -1, loader, new ModelTexture(loader.loadTexture("grass"))); //(0,-1), (1,-1)
 		
 		Camera camera = new Camera();
 		
@@ -68,8 +93,15 @@ public class MainGameLoop {
 			entity.increaseRotation(0, 1, 0);
 			camera.move();
 			
-			
+			renderer.processTerrain(terrain);
+			renderer.processTerrain(terrain2);
 			renderer.processEntity(entity);
+			renderer.processEntity(entity2);
+			
+			for(int index = 0; index < entities.size(); index++) {
+				renderer.processEntity(entities.get(index));
+				entities.get(index).increaseRotation(0, 1, 0);
+			}
 			
 			renderer.render(light, camera);
 			DisplayManager.updateDisplay();

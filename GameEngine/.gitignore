@@ -1,1 +1,7 @@
-/bin/
+* 
+!/.gitattributes 
+!/.gitignore 
+!/build.gradle 
+!/README.md 
+!/src
+!/res
